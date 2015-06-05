@@ -15,103 +15,101 @@ var {
 } = React;
 
 
-class SearchPage extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
+var SearchPage = React.createClass({
+  getInitialState: function() {
+    return {
       searchString: 'ergehen',
       isLoading: false,
       words: [],
       selected: []
-    };
-  }
+    }
+  },
 
   render() {
-    var spinner = this.state.isLoading ?
-      ( <ActivityIndicatorIOS
-        hidden='true'
-        size='large'/> ) :( <View/>);
-    return (
-        <View style={styles.container}>
-        <Text style={styles.description}>
-        Search Dictionary for German Word
+  var spinner = this.state.isLoading ?
+  ( <ActivityIndicatorIOS
+  hidden='true'
+  size='large'/> ) :( <View/>);
+  return (
+  <View style={styles.container}>
+    <Text style={styles.description}>
+      Search Dictionary for German Word
       </Text>
-        <View style={styles.flowRight}>
+      <View style={styles.flowRight}>
         <TextInput
       style={styles.searchInput}
       value={this.state.searchString}
-      onChange={this.onSearchTextChanged.bind(this)}
+      onChange={this.onSearchTextChanged}
       placeholder='Enter German Word'/>
         <TouchableHighlight style={styles.button}
-      underlayColor='#99d9f4'
-      onPress={this.onSearchPressed.bind(this)}>
-        <Text style={styles.buttonText}>Go</Text>
-        </TouchableHighlight>
-        {spinner}
-      </View>
-        </View>
-    );
-  }
-  
-  displayWords(words) {
-    this.props.navigator.push({
-      title: 'Results',
-      component: SearchResults,
-      rightButtonTitle: 'Save',
-      onRightButtonPress: () => {this.props.navigator.pop();
-                                 this.saveWords()},
-      passProps: {listings: words, onResultsToggle: this.onResultsToggle.bind(this)}
-    });
-    this.setState({ isLoading: false , words: words });
-  }
+        underlayColor='#99d9f4'
+        onPress={this.onSearchPressed}>
+          <Text style={styles.buttonText}>Go</Text>
+          </TouchableHighlight>
+          {spinner}</View></View>
+            );
+},
 
-  onResultsToggle(rowID) {
-    var selected = this.state.selected.slice(0);
-    var found = selected.indexOf(rowID);
-    if (found === -1) {
-      selected.push(rowID)
-      this.setState({selected: selected})
-    } else {
-      selected.splice(found,found);  
-      this.setState({selected: selected})
-    }
-    console.log("selected: " + selected);
-  }
+displayWords(words) {
+  this.props.navigator.push({
+    title: 'Results',
+    component: SearchResults,
+    rightButtonTitle: 'Save',
+    onRightButtonPress: () => {this.props.navigator.pop();
+                              this.saveWords()},
+                              passProps: {listings: words, onResultsToggle: this.onResultsToggle}
+                            });
+  this.setState({isLoading: false , words: words });
+},
 
-  saveWords() {
-    // takes the indexes of selected words uses those to pull words from list,
-    // sending that list to the parents save function
-    var selectedWords = []
-    for (var i = 0; i < this.state.selected.length; i++) {
-      var index = this.state.selected[i]
-      selectedWords.push(this.state.words[index])
-    }
-    this.props.save(selectedWords);
+onResultsToggle(rowID) {
+  var selected = this.state.selected.slice(0);
+  var found = selected.indexOf(rowID);
+  if (found === -1) {
+    selected.push(rowID)
+    this.setState({selected: selected})
+  } else {
+    selected.splice(found,1);
+    this.setState({selected: selected})
   }
+  console.log("selected: " + selected);
+},
 
-  executeQuery(query) {
-    this.setState({ isLoading: true });
-    var url = "http://localhost:8080/json/" + query;
-    fetch(url)
-      .then(response => response.json())
-      .then(json => this.displayWords(json))
-      .catch(error => 
-             this.setState({
-               isLoading: false,
-               message: 'Something bad happened ' + error
-             }));
+saveWords() {
+  // takes the indexes of selected words uses those to pull words from list,
+  // sending that list to the parents save function
+  var selectedWords = []
+  for (var i = 0; i < this.state.selected.length; i++) {
+    var index = this.state.selected[i];
+    console.log("index" + this.state.words[index]);
+    selectedWords.push(this.state.words[index])
   }
-  
-  onSearchPressed() {
-    var query = this.state.searchString;
-    this.executeQuery(query);
-  }
+  this.props.save(selectedWords);
+},
 
-  onSearchTextChanged(event) {
-    this.setState({ searchString: event.nativeEvent.text });
-    // console.log(this.state.searchString);
-  }
+executeQuery(query) {
+  this.setState({ isLoading: true });
+  var url = "http://localhost:8080/json/" + query;
+  fetch(url)
+  .then(response => response.json())
+  .then(json => this.displayWords(json))
+  .catch(error =>
+         this.setState({
+           isLoading: false,
+           message: 'Something bad happened ' + error
+         }));
+},
+
+onSearchPressed() {
+  var query = this.state.searchString;
+  this.executeQuery(query);
+},
+
+onSearchTextChanged(event) {
+  this.setState({ searchString: event.nativeEvent.text });
+  // console.log(this.state.searchString);
 }
+});
 
 var styles = StyleSheet.create({
   description: {

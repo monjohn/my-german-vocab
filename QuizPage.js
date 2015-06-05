@@ -11,7 +11,6 @@ var {
   Component
 } = React;
 
-
 var QuizPage = React.createClass({
   result: [],
    getInitialState() {
@@ -33,7 +32,7 @@ var QuizPage = React.createClass({
     this.setState({ current: this.state.current + 1, ger: true});
   },
   notYet() {
-    this.setState({ current: this.state.current + 1, ger: true}); 
+    this.setState({ current: this.state.current + 1, ger: true});
     this.result.push(this.props.list[this.state.current]);
   },
   render() {
@@ -53,7 +52,7 @@ var QuizPage = React.createClass({
         <View style={styles.card}>
           <Text numberOfLines={2} ref="definition" style={styles.definition}>{word}</Text>
         </View>
-       {this.state.ger ? <RevealButton  fun={this.reveal}/> : <ResultButtons gotIt={this.gotIt} notYet={this.notYet} />} 
+       {this.state.ger ? <RevealButton  fun={this.reveal}/> : <ResultButtons gotIt={this.gotIt} notYet={this.notYet} />}
       </View>
     );
   }
@@ -88,7 +87,7 @@ var RevealButton = React.createClass({
         <Text style={styles.buttonText}>Show English</Text>
         </TouchableHighlight>
 )}
-}); 
+});
 
 var styles = StyleSheet.create({
   body: {
