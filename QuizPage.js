@@ -8,86 +8,144 @@ var {
   TextInput,
   View,
   TouchableHighlight,
-  Component
+  Component,
+  AsyncStorage,
+  NavigatorIOS,
+  PickerIOS
 } = React;
 
+var PickerItemIOS = PickerIOS.Item;
+var LISTS = ['daily', 'weekly', 'monthy', 'yearly'];
+
 var QuizPage = React.createClass({
+  render() {
+    return (<NavigatorIOS
+            style={styles.body}
+            initialRoute={{
+            title: 'Review',
+            component: Select,
+            }}/>
+           )
+  }});
+
+var Quiz = React.createClass({
   result: [],
-   getInitialState() {
-    return {current: 0, ger: true};
+  getInitialState() {
+    return {current: 0,
+            ger: true,
+            list: [],
+            listName: "daily"};
   },
   saveList() {
     var result = this.result;
     //result = result.filter((x) => (x !== null));
     // console.log("saving: " + JSON.stringify(result));
-    this.props.saveList(this.props.listName, result);
+    this.saveList(this.state.listName, result);
     this.props.navigator.pop();
   },
   reveal() {
     this.setState({ger: false})},
   gotIt () {
-    var word = this.props.list[this.state.current];
+    var word = this.state.list[this.state.current];
     word.points++
     this.result.push(word);
     this.setState({ current: this.state.current + 1, ger: true});
   },
   notYet() {
     this.setState({ current: this.state.current + 1, ger: true});
-    this.result.push(this.props.list[this.state.current]);
+    this.result.push(this.state.list[this.state.current]);
   },
   render() {
-    if (this.state.current === this.props.list.length) {
+    if (this.state.current === this.state.list.length) {
       return (
-         <TouchableHighlight style={styles.button}
-      underlayColor='#99d9f4'
-    onPress={this.saveList} >
+
+
+
+        <TouchableHighlight style={styles.button}
+        underlayColor='#99d9f4'
+        onPress={this.saveList} >
         <Text style={styles.buttonText}>Save</Text>
         </TouchableHighlight>
-        )
-      } else {
-    var card = this.props.list[this.state.current];
-     var word = this.state.ger ? card.ger : card.eng;
-     return (
-      <View style={styles.container}>
+      )
+    } else {
+      var card = this.state.list[this.state.current];
+      var word = this.state.ger ? card.ger : card.eng;
+      return (
+        <View style={styles.container}>
         <View style={styles.card}>
-          <Text numberOfLines={2} ref="definition" style={styles.definition}>{word}</Text>
+        <Text numberOfLines={2} ref="definition" style={styles.definition}>{word}</Text>
         </View>
-       {this.state.ger ? <RevealButton  fun={this.reveal}/> : <ResultButtons gotIt={this.gotIt} notYet={this.notYet} />}
-      </View>
-    );
+        {this.state.ger ? <RevealButton  fun={this.reveal}/> : <ResultButtons gotIt={this.gotIt} notYet={this.notYet} />}
+        </View>
+      );
+    }
   }
-}
 });
 
 var ResultButtons = React.createClass({
   render() {
-  return (
-     <View style={styles.buttons}>
-         <TouchableHighlight style={styles.button}
+    return (
+      <View style={styles.buttons}>
+      <TouchableHighlight style={styles.button}
       underlayColor='#99d9f4'
       onPress={this.props.gotIt}>
-        <Text style={styles.buttonText}>Got it</Text>
-        </TouchableHighlight>
+      <Text style={styles.buttonText}>Got it</Text>
+      </TouchableHighlight>
 
-   <TouchableHighlight style={styles.button}
+      <TouchableHighlight style={styles.button}
       underlayColor='#99d9f4'
       onPress={this.props.notYet}>
-        <Text style={styles.buttonText}>Not yet</Text>
-        </TouchableHighlight>
-         </View>
-  )}
+      <Text style={styles.buttonText}>Not yet</Text>
+      </TouchableHighlight>
+      </View>
+    )}
 });
 
 var RevealButton = React.createClass({
   render(){
-  return (
-     <TouchableHighlight style={styles.button}
+    return (
+      <TouchableHighlight style={styles.button}
       underlayColor='#99d9f4'
-    onPress={this.props.fun} >
-        <Text style={styles.buttonText}>Show English</Text>
-        </TouchableHighlight>
-)}
+      onPress={this.props.fun} >
+      <Text style={styles.buttonText}>Show English</Text>
+      </TouchableHighlight>
+    )}
 });
+
+var Select = React.createClass({
+  goToQuiz() {
+    var o = {title: 'Quiz Me', // TODO: Make dynamic
+             component: Quiz,
+             passProps: {listName: this.state.listName,
+                         list: this.state.currentList,
+                         saveList: "saveList"}};
+    this.props.navigator.push(o); },
+  render(){
+    return (
+      <View style={styles.body}>
+      <Text style={styles.welcome}>Select a list to review</Text>
+      <PickerIOS
+      selectedValue={"daily"}
+      onValueChange={this._onValueChange}>
+      {LISTS.map(value => (
+      <PickerItemIOS
+      key={value}
+      value={value}
+      label={value}
+      />
+    ))}
+  </PickerIOS>
+  <View style={styles.buttonView}>
+                               <TouchableHighlight style={styles.button}
+                               underlayColor='#99d9f4'
+                               onPress={this.goToQuiz}>
+                               <Text style={styles.buttonText}>Review</Text>
+                               </TouchableHighlight>
+                               </View>
+                               </View>
+                              )}
+});
+
 
 var styles = StyleSheet.create({
   body: {

@@ -19,14 +19,17 @@ var {
 var ReviewPage = React.createClass( {
   getInitialState() {
     return { current: 0};
+
   },
- 
+
   nextWord() {
-   this.setState({ current: this.state.current + 1 }); 
+   this.setState({ current: this.state.current + 1 });
   },
+
   notYet() {
-    this.replaceState({ current: this.state.current + 1, ger: true }); 
+    this.replaceState({ current: this.state.current + 1, ger: true });
   },
+
   render() {
     var current = this.state.current;
 
@@ -36,7 +39,7 @@ var ReviewPage = React.createClass( {
         } else {
           card = {ger: "Finished", eng: "end of list"}
         }
-   
+
     return (
       <View style={styles.container}>
         <View style={styles.card}>
@@ -99,7 +102,7 @@ var styles = StyleSheet.create({
     height: 36,
     flex: 1,
     width: 100,
-    padding: 15,
+   //    alignItems: 'center',
     flexDirection: 'row',
     backgroundColor: '#48BBEC',
     borderColor: '#48BBEC',
@@ -107,7 +110,7 @@ var styles = StyleSheet.create({
     borderRadius: 8,
     marginVertical: 10,
     marginHorizontal: 20,
-    alignSelf: 'stretch',
+    alignSelf: 'center',
     justifyContent: 'center'
   },
   buttons: {

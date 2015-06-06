@@ -11,24 +11,23 @@ var {
   AppRegistry,
   AsyncStorage,
   NavigatorIOS,
-  PickerIOS,
   StyleSheet,
   TabBarIOS,
   Text,
   TouchableHighlight,
-  View,
+  View
 } = React;
 
-  var PickerItemIOS = PickerIOS.Item;
+
 
   var DAILY = '@GV:daily';
-  var LISTS = ['daily', 'weekly', 'monthy', 'yearly'];
+
   var DATA = [{ger: "abgehen", eng: "to depart (by train, bus), leave (the state)", list: 0, points:0},
     {ger:"angehen", eng: "to begin", list: 0, points: 0},
     {ger: "auf-gehen", eng: "to rise (of celestial bodies), to (come) upon", list:0, points:0} ];
 
-
-class GermanVocab extends React.Component {
+//class Main extends React.Component {
+class GermanVocab1 extends React.Component {
   render() {
     return (
       <NavigatorIOS
@@ -42,8 +41,17 @@ class GermanVocab extends React.Component {
 }
 
 
+var GermanVocab = React.createClass({
 
-var Main = React.createClass({
+
+  getInitialState: function() {
+    return {
+      selectedValue: 'daily',
+      selectedTab: 'review',
+      notifCount: 0,
+      presses: 0,
+    };
+  },
 
   componentDidMount() {
     // fetch list from disk, set retrieved data to currentList
@@ -91,23 +99,8 @@ var Main = React.createClass({
              passProps: {list: this.state.currentList}};
     this.props.navigator.push(o);},
 
-  goToQuiz() {
-    var o = {title: 'Quiz Me', // TODO: Make dynamic
-             component: QuizPage,
-             passProps: {listName: LISTS[0],
-                         list: this.state.currentList,
-                         saveList: saveList}};
-    this.props.navigator.push(o); },
 
-  formatWords(words) {
-    return words.map(function(w){
-      var dict = {};
-      dict.list = 0;
-      dict.points = 0;
-      dict.ger = w[0];
-      dict.eng = w[1];
-      return dict;})
-  },
+
 
   saveList(name, list) {
     var key = "@GV:" + name;
@@ -118,24 +111,11 @@ var Main = React.createClass({
     .done();
   },
 
-  saveToDaily(words) {
-    words = this.formatWords(words);
-    AsyncStorage.getItem(DAILY)
-    .then((value) => {
-      value = JSON.parse(value);
-      value = value.concat(words);
-      this.saveList(DAILY, value)})
-    .catch((error) => console.log('AsyncStorage saveToDaily error: ' + error.message))
-    .done();
-  },
 
-  //   _onValueChange(selectedValue) {
-  //     this.setState({selectedValue});
-  //     AsyncStorage.setItem(DAILY, selectedValue)
-  //       .then(() => console.log('Saved selection to disk: ' + selectedValue))
-  //       .catch((error) => console.log('AsyncStorage error: ' + error.message))
-  //         .done();
-  //   },
+    onSelectChange(selectedValue) {
+      this.setState({selectedValue});
+
+    },
 
   _removeStorage() {
     AsyncStorage.removeItem(DAILY)
@@ -145,35 +125,55 @@ var Main = React.createClass({
   },
 
   render() {
-    return (
-      <View style={styles.container}>
-
-      <TouchableHighlight style={styles.body}
-      onPress={this.goToSearch}
-      underlayColor='#99d9f4'>
-      <Text style={styles.welcome}>Search</Text>
-      </TouchableHighlight>
-
-      <TouchableHighlight style={styles.body}
-      onPress={this.goToReview}
-      underlayColor='#99d9f4'>
-      <Text style={styles.welcome}>Review</Text>
-      </TouchableHighlight>
-
-      <TouchableHighlight style={styles.body}
-      onPress={this.goToQuiz}
-      underlayColor='#99d9f4'>
-      <Text style={styles.welcome}>Quiz</Text>
-      </TouchableHighlight>
-
-
-      </View>
-    );
+      return (
+          <TabBarIOS
+        tintColor="black"
+        barTintColor="#3abeff">
+        <TabBarIOS.Item
+          title="Search"
+          icon={{uri:'search'}}
+          selected={this.state.selectedTab === 'search'}
+          onPress={() => {
+            this.setState({
+              selectedTab: 'search',
+            });
+          }}>
+          <SearchPage />
+        </TabBarIOS.Item>
+        <TabBarIOS.Item
+          systemIcon="history"
+          badge={this.state.notifCount > 0 ? this.state.notifCount : undefined}
+          selected={this.state.selectedTab === 'review'}
+          onPress={() => {
+            this.setState({
+              selectedTab: 'review',
+              notifCount: this.state.notifCount + 1,
+            });
+          }}>
+          <QuizPage />
+        </TabBarIOS.Item>
+        <TabBarIOS.Item
+          systemIcon="more"
+          selected={this.state.selectedTab === 'greenTab'}
+          onPress={() => {
+            this.setState({
+              selectedTab: 'greenTab',
+              presses: this.state.presses + 1
+            });
+          }}>
+          <Text>Green Tab</Text>
+        </TabBarIOS.Item>
+      </TabBarIOS>
+    )
   },
 });
 
+
+
+
 var styles = StyleSheet.create({
   body: {
+    paddingTop: 40,
     flex: 1,
     //    justifyContent: 'center',
     //    alignItems: 'center',
@@ -187,6 +187,7 @@ var styles = StyleSheet.create({
   },
   welcome: {
     fontSize: 20,
+    backgroundColor: '#F5FCFF',
     color: '#656565',
     textAlign: 'center',
     margin: 10,
@@ -194,35 +195,49 @@ var styles = StyleSheet.create({
   instructions: {
     textAlign: 'center',
     color: '#333333',
-    marginBottom: 5,
+    marginBottom: 2,
+    backgroundColor: 'white',
   },
   text: {
     color: 'black',
     backgroundColor: 'white',
     fontSize: 30,
     margin: 80
+  },
+  tabContent: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  tabText: {
+    color: 'white',
+    margin: 50,
+  },
+  buttonText: {
+    fontSize: 18,
+    color: 'white',
+    alignSelf: 'center'
+  },
+  button: {
+    flex: 1,
+     padding: 15,
+    backgroundColor: '#48BBEC',
+    borderColor: '#48BBEC',
+    borderWidth: 1,
+    borderRadius: 8,
+    marginBottom: 10,
+    alignSelf: 'center',
+    justifyContent: 'center'
+  },
+  buttonView: {
+    marginTop: 20,
+   // height: 40,
+   // width: 80,
+  //  justifyContent: 'center'
+
   }
 });
 
+
+
 AppRegistry.registerComponent('GermanVocab', () => GermanVocab);
-//   <PickerIOS
-// selectedValue={list}
-// onValueChange={this._onValueChange}>
-//   {LISTS.map((value) => (
-//       <PickerItemIOS
-//         key={value}
-//         value={value}
-//         label={value}
-//       />))}
-// </PickerIOS>
-//   <View >
-//     <Text  style={styles.instructions}>
-//       {'Selected: '}
-//     <Text>
-//       {this.state.selectedValue}
-//     </Text>
-//     </Text>
-//   <Text>{' '}</Text>
-//   <Text onPress={this._removeStorage}>
-//   Press here to remove from storage.
-//   </Text>
+

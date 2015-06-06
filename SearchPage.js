@@ -8,14 +8,27 @@ var {
   Text,
   TextInput,
   View,
+  NavigatorIOS,
   TouchableHighlight,
   ActivityIndicatorIOS,
+  AsyncStorage,
   Image,
   Component
 } = React;
 
 
 var SearchPage = React.createClass({
+  render() {
+  return (<NavigatorIOS
+      style={styles.body}
+      initialRoute={{
+      title: 'Search',
+      component: Search,
+      }}/>
+  )
+  }});
+
+var Search = React.createClass({
   getInitialState: function() {
     return {
       searchString: 'ergehen',
@@ -32,6 +45,7 @@ var SearchPage = React.createClass({
   size='large'/> ) :( <View/>);
   return (
   <View style={styles.container}>
+
     <Text style={styles.description}>
       Search Dictionary for German Word
       </Text>
@@ -51,6 +65,7 @@ var SearchPage = React.createClass({
 },
 
 displayWords(words) {
+  console.log("displayWords");
   this.props.navigator.push({
     title: 'Results',
     component: SearchResults,
@@ -75,16 +90,47 @@ onResultsToggle(rowID) {
   console.log("selected: " + selected);
 },
 
+
+   formatWords(words) {
+    return words.map(function(w){
+      var dict = {};
+      dict.list = 0;
+      dict.points = 0;
+      dict.ger = w[0];
+      dict.eng = w[1];
+      return dict;})
+  },
+
+  saveList(name, list) {
+    var key = "@GV:" + name;
+    list = JSON.stringify(list);
+    AsyncStorage.setItem(name, list)
+    .then(() => console.log('Saved selection to disk: ' + list))
+    .catch((error) => console.log('AsyncStorage error: ' + error.message))
+    .done();
+  },
+
+  saveToDaily(words) {
+    words = this.formatWords(words);
+    AsyncStorage.getItem('@GV:daily')
+    .then((value) => {
+      value = JSON.parse(value);
+      value = value.concat(words);
+      this.saveList("daily", value)})
+    .catch((error) => console.log('AsyncStorage saveToDaily error: ' + error.message))
+    .done();
+  },
+
 saveWords() {
   // takes the indexes of selected words uses those to pull words from list,
   // sending that list to the parents save function
   var selectedWords = []
   for (var i = 0; i < this.state.selected.length; i++) {
     var index = this.state.selected[i];
-    console.log("index" + this.state.words[index]);
+   // console.log("index" + this.state.words[index]);
     selectedWords.push(this.state.words[index])
   }
-  this.props.save(selectedWords);
+  this.saveToDaily(selectedWords);
 },
 
 executeQuery(query) {
@@ -112,11 +158,18 @@ onSearchTextChanged(event) {
 });
 
 var styles = StyleSheet.create({
+  body: {
+    paddingTop: 20,
+    flex: 1,
+    //    justifyContent: 'center',
+    //    alignItems: 'center',
+  },
   description: {
     marginBottom: 20,
     fontSize: 18,
     textAlign: 'center',
-    color: '#656565'
+    color: '#656565',
+    backgroundColor: '#F5FCFF',
   },
   container: {
     padding: 30,
