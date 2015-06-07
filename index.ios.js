@@ -27,22 +27,21 @@ var {
     {ger: "auf-gehen", eng: "to rise (of celestial bodies), to (come) upon", list:0, points:0} ];
 
 //class Main extends React.Component {
-class GermanVocab1 extends React.Component {
-  render() {
-    return (
-      <NavigatorIOS
-      style={styles.body}
-      initialRoute={{
-      title: 'My German Vocab',
-      component: Main,
-      }}/>
-    );
-  }
-}
+// class GermanVocab1 extends React.Component {
+//   render() {
+//     return (
+//       <NavigatorIOS
+//       style={styles.body}
+//       initialRoute={{
+//       title: 'My German Vocab',
+//       component: Main,
+//       }}/>
+//     );
+//   }
+// }
 
 
 var GermanVocab = React.createClass({
-
 
   getInitialState: function() {
     return {
@@ -51,39 +50,6 @@ var GermanVocab = React.createClass({
       notifCount: 0,
       presses: 0,
     };
-  },
-
-  componentDidMount() {
-    // fetch list from disk, set retrieved data to currentList
-  //  this.saveList("daily", JSON.stringify(DATA));
-    AsyncStorage.getItem(DAILY)
-    .then((value) => {
-      if (value !== null){
-        value = JSON.parse(value);
-        console.log('Data from disk: ' + JSON.stringify(value));
-        this.setState({currentList: value});
-      } else {
-        console.log('No selection found on disk.');
-        this.setState({currentList: DATA});
-      }
-    })
-    .catch((error) => console.log('AsyncStorage error: ' + error.message))
-    .done();
-
-  },
-  // fetches list and sets result to currentList
-  fetchList(l) {
-    AsyncStorage.getItem(l)
-    .then((value) => {
-      if (value !== null){
-        return value = JSON.parse(value);
-        console.log('Data from disk: ' + JSON.stringify(value));
-      } else {
-        console.log('No selection found on disk.');
-        return null;
-      }})
-    .catch((error) => console.log('AsyncStorage error: ' + error.message))
-    .done();
   },
 
 
@@ -101,7 +67,6 @@ var GermanVocab = React.createClass({
 
 
 
-
   saveList(name, list) {
     var key = "@GV:" + name;
     list = JSON.stringify(list);
@@ -111,11 +76,6 @@ var GermanVocab = React.createClass({
     .done();
   },
 
-
-    onSelectChange(selectedValue) {
-      this.setState({selectedValue});
-
-    },
 
   _removeStorage() {
     AsyncStorage.removeItem(DAILY)
@@ -212,29 +172,7 @@ var styles = StyleSheet.create({
     color: 'white',
     margin: 50,
   },
-  buttonText: {
-    fontSize: 18,
-    color: 'white',
-    alignSelf: 'center'
-  },
-  button: {
-    flex: 1,
-     padding: 15,
-    backgroundColor: '#48BBEC',
-    borderColor: '#48BBEC',
-    borderWidth: 1,
-    borderRadius: 8,
-    marginBottom: 10,
-    alignSelf: 'center',
-    justifyContent: 'center'
-  },
-  buttonView: {
-    marginTop: 20,
-   // height: 40,
-   // width: 80,
-  //  justifyContent: 'center'
 
-  }
 });
 
 
