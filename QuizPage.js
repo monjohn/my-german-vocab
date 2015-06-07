@@ -96,24 +96,6 @@ var Select = React.createClass({
 });
 
 var Quiz = React.createClass({
-//    componentDidMount() {
-//     // fetch list from disk, set retrieved data to currentList
-//   //  this.saveList("daily", JSON.stringify(DATA));
-//     AsyncStorage.getItem(DAILY)
-//     .then((value) => {
-//       if (value !== null){
-//         value = JSON.parse(value);
-//         console.log('Data from disk: ' + JSON.stringify(value));
-//         this.setState({currentList: value});
-//       } else {
-//         console.log('No selection found on disk.');
-//         this.setState({currentList: DATA});
-//       }
-//     })
-//     .catch((error) => console.log('AsyncStorage error: ' + error.message))
-//     .done();
-
-//   },
 
   result: [],
 
@@ -128,7 +110,6 @@ var Quiz = React.createClass({
 
   saveList() {
     var result = this.result;
-    //result = result.filter((x) => (x !== null));
     // console.log("saving: " + JSON.stringify(result));
     this.saveList(this.props.listName, result);
     this.props.navigator.pop();
@@ -197,11 +178,13 @@ var ResultButtons = React.createClass({
 var RevealButton = React.createClass({
   render(){
     return (
+      <View style={styles.buttonView}>
       <TouchableHighlight style={styles.button}
       underlayColor='#99d9f4'
       onPress={this.props.fun} >
       <Text style={styles.buttonText}>Show English</Text>
       </TouchableHighlight>
+      </View>
     )}
 });
 
@@ -241,19 +224,23 @@ var styles = StyleSheet.create({
   button: {
     flex: 1,
      padding: 15,
+    height:50,
     backgroundColor: '#48BBEC',
     borderColor: '#48BBEC',
     borderWidth: 1,
     borderRadius: 8,
-    marginBottom: 10,
-    alignSelf: 'center',
-    justifyContent: 'center'
+    marginVertical: 10,
+    marginHorizontal: 20,
+    alignSelf: 'stretch',
+    justifyContent: 'center',
+
   },
   buttonView: {
     marginTop: 20,
    // height: 40,
    // width: 80,
-  //  justifyContent: 'center'
+    alignItems: 'flex-end',
+    justifyContent: 'center'
 
   },
 
@@ -272,15 +259,17 @@ var styles = StyleSheet.create({
 //     borderColor: '#48BBEC',
 //     borderWidth: 1,
 //     borderRadius: 8,
-//     marginVertical: 10,
-//     marginHorizontal: 20,
+
 //     alignSelf: 'stretch',
 //     justifyContent: 'center'
 //   },
-//   buttons: {
-//     marginTop: 20,
-//     flexDirection: 'row',
-//     justifyContent: 'space-around'}
+  buttons: {
+    flex: 1,
+    marginTop: 20,
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    justifyContent: 'space-between'
+  }
 });
 
 module.exports = QuizPage;
