@@ -19,28 +19,6 @@ var {
 } = React;
 
 
-
-  var DAILY = '@GV:daily';
-
-  var DATA = [{ger: "abgehen", eng: "to depart (by train, bus), leave (the state)", list: 0, points:0},
-    {ger:"angehen", eng: "to begin", list: 0, points: 0},
-    {ger: "auf-gehen", eng: "to rise (of celestial bodies), to (come) upon", list:0, points:0} ];
-
-//class Main extends React.Component {
-// class GermanVocab1 extends React.Component {
-//   render() {
-//     return (
-//       <NavigatorIOS
-//       style={styles.body}
-//       initialRoute={{
-//       title: 'My German Vocab',
-//       component: Main,
-//       }}/>
-//     );
-//   }
-// }
-
-
 var GermanVocab = React.createClass({
 
   getInitialState: function() {
@@ -51,20 +29,6 @@ var GermanVocab = React.createClass({
       presses: 0,
     };
   },
-
-
-  goToSearch() {
-    var o = {title: 'Search',
-             component: SearchPage,
-             passProps: {save: this.saveToDaily}};
-    this.props.navigator.push(o); },
-
-  goToReview() {
-    var o = {title: 'Daily', // TODO: Make dynamic
-             component: ReviewPage,
-             passProps: {list: this.state.currentList}};
-    this.props.navigator.push(o);},
-
 
 
   saveList(name, list) {

@@ -54,8 +54,6 @@ var Select = React.createClass({
       if (value !== null){
         value = JSON.parse(value);
         o.passProps.list = value;
-        console.log(o);
-//        console.log('Data from disk: ' + JSON.stringify(value));
         this.props.navigator.push(o);
       } else {
         console.log('No selection found on disk.');
@@ -103,15 +101,19 @@ var Quiz = React.createClass({
     return {current: 0,
             ger: true,
             list: [],
-           // listName: "daily"
            };
   },
 
 
   saveList() {
-    var result = this.result;
-    // console.log("saving: " + JSON.stringify(result));
-    this.saveList(this.props.listName, result);
+    var key = "@GV:" + this.props.listName;
+    var list = JSON.stringify(this.result);
+    console.log(this.state.result);
+    AsyncStorage.setItem(key, list)
+    .then(() => console.log('Saved selection to disk: ' + list))
+    .catch((error) => console.log('AsyncStorage error: ' + error.message))
+    .done();
+
     this.props.navigator.pop();
   },
 
@@ -127,19 +129,22 @@ var Quiz = React.createClass({
   },
 
   notYet() {
+    var word = this.props.list[this.state.current];
     this.setState({ current: this.state.current + 1, ger: true});
-    this.result.push(this.state.list[this.state.current]);
+    this.result.push(word);
   },
 
   render() {
     console.log(this.props.saveList);
     if (this.state.current === this.props.list.length) {
       return (
+        <View style={styles.buttonView}>
         <TouchableHighlight style={styles.button}
           underlayColor='#99d9f4'
           onPress={this.saveList} >
-        <Text style={styles.buttonText}>Save</Text>
+        <Text style={styles.container}>Save</Text>
         </TouchableHighlight>
+        </View>
       )
     } else {
       var card = this.props.list[this.state.current];
@@ -196,7 +201,7 @@ var styles = StyleSheet.create({
   },
   container: {
     backgroundColor: '#F5FCFF',
-    padding: 30,
+    padding: 20,
     marginTop: 65,
     alignItems: 'center',
     flex: 1
@@ -217,7 +222,7 @@ var styles = StyleSheet.create({
     height: 290,
   },
   definition: {
-    fontSize: 30,
+    fontSize: 20,
     textAlign: 'center',
   },
 
@@ -231,6 +236,7 @@ var styles = StyleSheet.create({
     borderRadius: 8,
     marginVertical: 10,
     marginHorizontal: 20,
+    flexDirection: 'row',
     alignSelf: 'stretch',
     justifyContent: 'center',
 
@@ -249,20 +255,6 @@ var styles = StyleSheet.create({
     color: 'white',
     alignSelf: 'center'
   },
-//   button: {
-//     height: 36,
-//     flex: 1,
-//     width: 100,
-//     padding: 15,
-//     flexDirection: 'row',
-//     backgroundColor: '#48BBEC',
-//     borderColor: '#48BBEC',
-//     borderWidth: 1,
-//     borderRadius: 8,
-
-//     alignSelf: 'stretch',
-//     justifyContent: 'center'
-//   },
   buttons: {
     flex: 1,
     marginTop: 20,
