@@ -30,24 +30,23 @@ var GermanVocab = React.createClass({
     };
   },
 
+  // saveList(name, list) {
+  //   var key = "@GV:" + name;
+  //   console.log(key);
+  //   list = JSON.stringify(list);
+  //   AsyncStorage.setItem(key, list)
+  //   .then(() => console.log('Saved selection to disk: ' + "value"))
+  //   .catch((error) => console.log('AsyncStorage error: ' + error.message))
+  //   .done();
+  // },
 
-  saveList(name, list) {
-    var key = "@GV:" + name;
-    console.log(key);
-    list = JSON.stringify(list);
-    AsyncStorage.setItem(key, list)
-    .then(() => console.log('Saved selection to disk: ' + "value"))
-    .catch((error) => console.log('AsyncStorage error: ' + error.message))
-    .done();
-  },
 
-
-  _removeStorage() {
-    AsyncStorage.removeItem(DAILY)
-    .then(() => this._appendMessage('Selection removed from disk.'))
-    .catch((error) => { this._appendMessage('AsyncStorage error: ' + error.message) })
-    .done();
-  },
+  // _removeStorage() {
+  //   AsyncStorage.removeItem(DAILY)
+  //   .then(() => this._appendMessage('Selection removed from disk.'))
+  //   .catch((error) => { this._appendMessage('AsyncStorage error: ' + error.message) })
+  //   .done();
+  // },
 
   render() {
       return (
@@ -92,9 +91,6 @@ var GermanVocab = React.createClass({
     )
   },
 });
-
-
-
 
 var styles = StyleSheet.create({
   body: {

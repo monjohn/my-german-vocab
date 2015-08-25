@@ -52,6 +52,7 @@ var Select = React.createClass({
                          saveList: "saveList"}};
     var key = makeKey(this.state.selectedValue);
     console.log("key: " + key);
+ AsyncStorage.getAllKeys((x) => {console.log(x)});
     AsyncStorage.getItem(key)
     .then((value) => {
       if (value !== null){
