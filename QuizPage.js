@@ -40,7 +40,9 @@ var QuizPage = React.createClass({
 var Select = React.createClass({
 
   getInitialState() {
-    return {selectedValue: 'daily'}},
+    return {selectedValue: 'daily',
+           errorMessage: ''}
+  },
 
   goToQuiz() {
     var o = {title: 'Quiz Me', // TODO: Make dynamic
@@ -49,14 +51,18 @@ var Select = React.createClass({
                          list: [],
                          saveList: "saveList"}};
     var key = makeKey(this.state.selectedValue);
+    console.log("key: " + key);
     AsyncStorage.getItem(key)
     .then((value) => {
       if (value !== null){
+        this.setState({errorMessage: ""});
         value = JSON.parse(value);
+                console.log("loaded: " + value);
+
         o.passProps.list = value;
         this.props.navigator.push(o);
       } else {
-        console.log('No selection found on disk.');
+        this.setState({errorMessage: "No list found for this selection"});
         return null;
       }})
     .catch((error) => console.log('AsyncStorage error: ' + error.message))
@@ -89,6 +95,11 @@ var Select = React.createClass({
           <Text style={styles.buttonText}>Review</Text>
          </TouchableHighlight>
        </View>
+        <View>
+        <Text>
+        {this.state.errorMessage}
+      </Text>
+        </View>
       </View>
   )}
 });
@@ -135,16 +146,18 @@ var Quiz = React.createClass({
   },
 
   render() {
-    console.log(this.props.saveList);
+  //  console.log(this.props.saveList);
     if (this.state.current === this.props.list.length) {
       return (
+        <View style={styles.container}>
         <View style={styles.buttonView}>
         <TouchableHighlight style={styles.button}
           underlayColor='#99d9f4'
           onPress={this.saveList} >
-        <Text style={styles.container}>Save</Text>
+        <Text style={styles.buttonText}>Save Your Results</Text>
         </TouchableHighlight>
         </View>
+          </View>
       )
     } else {
       var card = this.props.list[this.state.current];

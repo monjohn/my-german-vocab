@@ -19,13 +19,13 @@ var {
 
 var SearchPage = React.createClass({
   render() {
-  return (<NavigatorIOS
-      style={styles.body}
-      initialRoute={{
-      title: 'Search',
-      component: Search,
-      }}/>
-  )
+    return (<NavigatorIOS
+            style={styles.body}
+            initialRoute={{
+              title: 'Search',
+              component: Search,
+            }}/>
+           )
   }});
 
 var Search = React.createClass({
@@ -34,64 +34,64 @@ var Search = React.createClass({
       searchString: 'ergehen',
       isLoading: false,
       words: [],
-      selected: []
+      selected: [],
+      message: ''
     }
   },
 
   render() {
-  var spinner = this.state.isLoading ?
-  ( <ActivityIndicatorIOS
-  hidden='true'
-  size='large'/> ) :( <View/>);
-  return (
-  <View style={styles.container}>
+    var spinner = this.state.isLoading ?
+        ( <ActivityIndicatorIOS
+          hidden='true'
+          size='large'/> ) :( <View/>);
+    return (
+        <View style={styles.container}>
 
-    <Text style={styles.description}>
-      Search Dictionary for German Word
+        <Text style={styles.description}>
+        Search Dictionary for German Word
       </Text>
-      <View style={styles.flowRight}>
+        <View style={styles.flowRight}>
         <TextInput
       style={styles.searchInput}
       value={this.state.searchString}
       onChange={this.onSearchTextChanged}
       placeholder='Enter German Word'/>
         <TouchableHighlight style={styles.button}
-        underlayColor='#99d9f4'
-        onPress={this.onSearchPressed}>
-          <Text style={styles.buttonText}>Go</Text>
-          </TouchableHighlight>
-          {spinner}</View></View>
-            );
-},
+      underlayColor='#99d9f4'
+      onPress={this.onSearchPressed}>
+        <Text style={styles.buttonText}>Go</Text>
+        </TouchableHighlight>
+        {spinner}</View></View>
+    );
+  },
 
-displayWords(words) {
-  console.log("displayWords");
-  this.props.navigator.push({
-    title: 'Results',
-    component: SearchResults,
-    rightButtonTitle: 'Save',
-    onRightButtonPress: () => {this.props.navigator.pop();
-                              this.saveWords()},
-                              passProps: {listings: words, onResultsToggle: this.onResultsToggle}
-                            });
-  this.setState({isLoading: false , words: words });
-},
+  displayWords(words) {
+    this.props.navigator.push({
+      title: 'Results',
+      component: SearchResults,
+      rightButtonTitle: 'Save',
+      onRightButtonPress: () => {this.props.navigator.pop();
+                                 this.saveWords()},
+      passProps: {listings: words, onResultsToggle: this.onResultsToggle}
+    });
+    this.setState({isLoading: false , words: words });
+  },
 
-onResultsToggle(rowID) {
-  var selected = this.state.selected.slice(0);
-  var found = selected.indexOf(rowID);
-  if (found === -1) {
-    selected.push(rowID)
-    this.setState({selected: selected})
-  } else {
-    selected.splice(found,1);
-    this.setState({selected: selected})
-  }
-  console.log("selected: " + selected);
-},
+  onResultsToggle(rowID) {
+    var selected = this.state.selected.slice(0);
+    var found = selected.indexOf(rowID);
+    if (found === -1) {
+      selected.push(rowID)
+      this.setState({selected: selected})
+    } else {
+      selected.splice(found,1);
+      this.setState({selected: selected})
+    }
+    console.log("selected: " + selected);
+  },
 
 
-   formatWords(words) {
+  formatWords(words) {
     return words.map(function(w){
       var dict = {};
       dict.list = 0;
@@ -105,56 +105,54 @@ onResultsToggle(rowID) {
     var key = "@GV:" + name;
     list = JSON.stringify(list);
     AsyncStorage.setItem(name, list)
-    .then(() => console.log('Saved selection to disk: ' + list))
-    .catch((error) => console.log('AsyncStorage error: ' + error.message))
-    .done();
+      .then((x) => console.log('Saved selection to disk: ' + x))
+      .catch((error) => console.log('AsyncStorage error: ' + error.message))
+        .done();
   },
 
   saveToDaily(words) {
     words = this.formatWords(words);
     AsyncStorage.getItem('@GV:daily')
-    .then((value) => {
-      value = JSON.parse(value);
-      value = value.concat(words);
-      this.saveList("daily", value)})
-    .catch((error) => console.log('AsyncStorage saveToDaily error: ' + error.message))
-    .done();
+      .then((value) => {
+        value = JSON.parse(value);
+        value = value.concat(words);
+        this.saveList("daily", value)})
+      .catch((error) => console.log('AsyncStorage saveToDaily error: ' + error.message))
+        .done();
   },
 
-saveWords() {
-  // takes the indexes of selected words uses those to pull words from list,
-  // sending that list to the parents save function
-  var selectedWords = []
-  for (var i = 0; i < this.state.selected.length; i++) {
-    var index = this.state.selected[i];
-   // console.log("index" + this.state.words[index]);
-    selectedWords.push(this.state.words[index])
+  saveWords() {
+    // takes the indexes of selected words uses those to pull words from list,
+    // sending that list to the parents save function
+    var selectedWords = []
+    for (var i = 0; i < this.state.selected.length; i++) {
+      var index = this.state.selected[i];
+      // console.log("index" + this.state.words[index]);
+      selectedWords.push(this.state.words[index])
+    }
+    // console.log(selectedWords);
+   
+    this.saveToDaily(selectedWords);
+  },
+
+  executeQuery(query) {
+    this.setState({ isLoading: true });
+    var url = "http://localhost:8080/json/" + query;
+    fetch(url)
+      .then(response => response.json())
+      .then(json => this.displayWords(json))
+    //  .catch(error => this.setState({isLoading: false, message: 'Something bad happened ' + error}))
+      .done();
+  },
+
+  onSearchPressed() {
+    var query = this.state.searchString;
+    this.executeQuery(query);
+  },
+
+  onSearchTextChanged(event) {
+    this.setState({ searchString: event.nativeEvent.text });
   }
-  this.saveToDaily(selectedWords);
-},
-
-executeQuery(query) {
-  this.setState({ isLoading: true });
-  var url = "http://localhost:8080/json/" + query;
-  fetch(url)
-  .then(response => response.json())
-  .then(json => this.displayWords(json))
-  .catch(error =>
-         this.setState({
-           isLoading: false,
-           message: 'Something bad happened ' + error
-         }));
-},
-
-onSearchPressed() {
-  var query = this.state.searchString;
-  this.executeQuery(query);
-},
-
-onSearchTextChanged(event) {
-  this.setState({ searchString: event.nativeEvent.text });
-  // console.log(this.state.searchString);
-}
 });
 
 var styles = StyleSheet.create({

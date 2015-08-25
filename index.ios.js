@@ -33,9 +33,10 @@ var GermanVocab = React.createClass({
 
   saveList(name, list) {
     var key = "@GV:" + name;
+    console.log(key);
     list = JSON.stringify(list);
-    AsyncStorage.setItem(name, list)
-    .then(() => console.log('Saved selection to disk: ' + list))
+    AsyncStorage.setItem(key, list)
+    .then(() => console.log('Saved selection to disk: ' + "value"))
     .catch((error) => console.log('AsyncStorage error: ' + error.message))
     .done();
   },
@@ -139,7 +140,6 @@ var styles = StyleSheet.create({
 
 });
 
-
-
 AppRegistry.registerComponent('GermanVocab', () => GermanVocab);
+
 

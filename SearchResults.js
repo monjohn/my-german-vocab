@@ -11,7 +11,6 @@ var {
   Component
 } = React;
 
-
 var SearchResults = React.createClass({
   // get results from parent properties, add 'unselected' to each one,
   // make result the datasource for list
@@ -21,39 +20,25 @@ var SearchResults = React.createClass({
       this.rowData = this.props.listings.map(function (a) {
       a.push("unselected");
       return a});
-  var ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
+  var ds = new ListView.DataSource({rowHasChanged: (r1, r2) =>  true});
   return {
     dataSource: ds.cloneWithRows(this.rowData)
-  };
-},
-
-//   constructor(props) {
-//     super(props);
-//     // this.setProps(listings
-//     this.rowData = this.props.listings.map(function (a) {
-//       a.push("unselected");
-//       return a});
-//     var ds = new ListView.DataSource( {rowHasChanged: function(r1, r2) { return (r1, r2) => r1 !== r2} } );
-//     this.state = {
-//       dataSource: ds.cloneWithRows(this.rowData),
-//       test: "test"
-//     };
-//   }
+  }},
 
   rowPressed(rowID) {
     // toggles selected on element in rowData and assigns that data as datasource for list
-    var sel = this.rowData[rowID][2] === "selected" ?  "unselected" : "selected";
-    this.rowData[rowID][2] = sel;
+    var sel = this.rowData[rowID][2];
+    var clone = this.rowData.slice(0);
+    clone[rowID][2] = sel === "selected" ?  "unselected" : "selected";
     this.props.onResultsToggle(rowID); // sends rowID to SearchPage
-    this.setState({dataSource: this.state.dataSource.cloneWithRows(this.rowData)});
+    this.setState({dataSource: this.state.dataSource.cloneWithRows(clone)});
   },
 
   isSelected(s) {
-    s == "selected" ? true : false;
+    return s == "selected" ? true : false;
   },
 
   renderRow(rowData, sectionID, rowID) {
-    console.log(rowData[2]);
     var rowStyle =  this.isSelected(rowData[2]) ? styles.rowContainerSelected : styles.rowContainer;
     return (
         <TouchableHighlight onPress={() => this.rowPressed(rowID)}
@@ -104,7 +89,7 @@ var styles = StyleSheet.create({
   },
 
   rowContainerSelected: {
-    backgroundColor: '#F5FCFF',
+    backgroundColor: "#333",// '#F5FCFF',
     flexDirection: 'row',
     padding: 10
   }
